@@ -1,0 +1,2 @@
+# Pentagopark
+Jännittävääkin jännittävämpi harjoitusprojekti Helsingin yliopiston Tietokantasovellus-kurssille.

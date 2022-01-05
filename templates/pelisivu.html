@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<div class="list-wrapper">
+  <ul id="players" class="list">
+  </ul>
+  <button id="poistubutton">Poistu aulasta</button>
+  <button id="haastabutton">Haasta peliin</button>
+</div>
+<script src="../static/peliaula.js" charset="utf-8"></script>
+<!--
+<canvas id="myCanvas" width="200" height="100"></canvas>
+<script src="../static/index.js" charset="utf-8"></script>
+-->
+{% endblock %}
