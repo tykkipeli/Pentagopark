@@ -121,44 +121,22 @@ function board_event(xx, yy) {
 }
 
 $(document).ready(function() {
-        //var socket = io.connect('http://127.0.0.1:5000');
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('connect', function() {
-            //socket.send('User has connected!');
-        });
-
-        socket.on('message', function(msg) {
-            $("#messages").append('<li>'+msg+'</li>');
-            console.log('Received message');
-        });
-
         $('#sendbutton').on('click', function() {
             console.log("LOL?");
-            socket.send($('#myMessage').val());
             $('#myMessage').val('');
         });
         
         $('#roombutton').on('click', function() {
             console.log("MOI");
-            socket.emit('joinaus', 0);
         });
 
         $('#myCanvas').on('click', function(e) {
-            socket.emit('my_event', e.clientX, e.clientY);
+            console.log('klikkasit kohtaa ' + e.clientX + ' ' + e.clientY);
         });
-        
-        
         
         $('#pelilinkki').on('click', function() {
             console.log("HEI");
-            socket.emit('pelaaja_liittyi');
         });
-        
-        socket.on('my_response', function(msg) {
-            //board_event(msg.x, msg.y);
-            $("#players").append('<li>'+ msg +'</li>');
-        });
+
 });
 
-//var socket = io.connect('http://' + document.domain + ':' + location.port);
