@@ -1,45 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Side Navigation Bar</title>
-    
-    <link rel="stylesheet" href="../static/style.css"></link>
-    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
-
-</head>
-<body>
-
-<div class="wrapper">
-    <div class="sidebar">
-        <h2>Pentagopark</h2>
-        <ul>
-            <li><a href="/"><i class="fas fa-home"></i>Etusivu</a></li>
-            <li><a id=pelilinkki href="/play"><i class="fas fa-home"></i>Peliaula</a></li>
-            <li><a href="#"><i class="fas fa-user"></i>Ranking</a></li>
-            <li><a href="#"><i class="fas fa-address-card"></i>Profiili</a></li>
-            <li><a href="#"><i class="fas fa-project-diagram"></i>Settings</a></li>
-            <li><a href="#"><i class="fas fa-blog"></i>Analyysi</a></li>
-        </ul> 
-    </div>
-    <div class="main_content"> 
-        {% block content %}{% endblock %}
-    </div>
-    <div class ="login">
-        {% if session.username %}
-        <p>Olet kirjautunut nimellä {{ session.username }}</p>
-        <a href="/logout">Kirjaudu ulos</a>
-        {% else %}
-        <form action="/login" method="POST">
-        <p>Tunnus:<br>
-        <input type="text" name="username"></p>
-        <p>Salasana:<br>
-        <input type="password" name="password"></p>
-        <input id="loginbutton" type="submit" value="Kirjaudu">
-        </form>
-        {% endif %}
-    </div>
-</div>
-
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pentagopark</title>
+        <link rel="stylesheet" href="../static/style.css"></link>
+    </head>
+    <body>
+        <div class="container">
+            <div class="sidebar">
+                <h2>PENTAGOPARK</h2>
+                <ul>
+                    <li><a href="/">Etusivu</a></li>
+                    <li><a href="/play">Peliaula</a></li>
+                    <li><a href="/">Analyysi</a></li>
+                    <li><a href="/">Ranking</a></li>
+                    <li><a href="/">Profiili</a></li>
+                    <li><a href="/">Asetukset</a></li>
+                    {% if session.username %}
+                    <p>Olet kirjautunut nimellä {{ session.username }}</p>
+                    <li><a href="/logout">Kirjaudu ulos</a></li>
+                    {% else %}
+                    <li><a href="/loginpage">Kirjaudu sisään</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="site">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </body>
 </html>

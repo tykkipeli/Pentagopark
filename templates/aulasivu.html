@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+<!--
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
+-->
+
+<!-- import jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<div class="content waiting-room">
+    <h2>Aulama</h2>
+    <div class="row">
+        <div class="block">
+            <ul id="playerlist" class="playerlist">
+                {% for player in players %}
+                <li tabindex="1"> {{ player }} </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="block challenge-area">
+            <div id="tulevahaaste">
+                <!--
+                <h3> Pelaaja nänänän haastaa sinut </h3>
+                <button id="acceptbutton">Hyväksy</button>
+                <button id="rejectbutton">Hylkää</button>
+                -->
+            </div>
+            <h3>Haaste</h3>
+            <button id="haastabutton">Haasta peliin</button>
+        </div>
+    </div>
+</div>
+<script src="../static/peliaula.js" charset="utf-8"></script>
+{% endblock %}
