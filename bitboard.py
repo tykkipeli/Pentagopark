@@ -83,6 +83,17 @@ def make_whole_move(x, y, board, vuoro):
 def tee_siirto_ja_kaanto(x,y,kaanto, board, vuoro):
     board = make_whole_move(x,y,board,vuoro)
     return (teeKaanto(kaanto,board[0]), teeKaanto(kaanto, board[1]))
+
+def get_result(board):
+    if loytyy_viiden_suora(board[0]) and loytyy_viiden_suora(board[1]):
+        return "tasapeli"
+    if loytyy_viiden_suora(board[0]):
+        return "valkoisen voitto"
+    if loytyy_viiden_suora(board[1]):
+        return "mustan voitto"
+    if bin(board[0]).count('1') + bin(board[1]).count('1') == 36:
+        return "tasapeli"
+    return "kesken"
     
 def testailu():
     board = (0,0)

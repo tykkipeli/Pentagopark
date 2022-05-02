@@ -1,89 +1,11 @@
 
-var c = document.getElementById("myCanvas");
+var canvas = document.getElementById("myCanvas");
 
-//c.width = window.innerWidth;
-//c.height = window.innerHeight;
+const board = new Board();
+const state = new State(board);
 
-var ctx = c.getContext("2d");
-ctx.fillStyle = "#FF0000";
-
-var board = new Array(6);
-var board_pos = new Array(6);
-var koko = 50;
-var offset = koko;
-var vali = koko;
-var kuula_paikan_koko = koko/5;
-var kuula_koko = koko*3/10;
-var tunnistus_sade = koko/5;
-var kaanto_tunnistus_sade = koko/3
-var sisasize = 2*offset + 5*vali;
-var ulkosize = 2*offset + 5*vali + 2*offset;
-var kaanto_pos = {}
-kaanto_pos["ylavasen-vasen"] = {x: offset/2 , y: 3*offset };
-kaanto_pos["ylavasen-oikea"] = {x: 3*offset , y: offset/2 };
-kaanto_pos["ylaoikea-vasen"] = {x: 6*offset , y: offset/2 };
-kaanto_pos["ylaoikea-oikea"] = {x: sisasize + 1.5*offset , y: 3*offset };
-kaanto_pos["alavasen-vasen"] = {x: 3*offset , y: sisasize + 1.5*offset };
-kaanto_pos["alavasen-oikea"] = {x: offset/2 , y: 6*offset };
-kaanto_pos["alaoikea-vasen"] = {x: sisasize + 1.5*offset , y: 6*offset };
-kaanto_pos["alaoikea-oikea"] = {x: 6*offset , y: sisasize + 1.5*offset};
-var kaanto_napit = ["ylavasen-vasen","ylavasen-oikea","ylaoikea-vasen","ylaoikea-oikea","alavasen-vasen","alavasen-oikea","alaoikea-vasen","alaoikea-oikea"];
-c.width = ulkosize;
-c.height = ulkosize;
-
-var movex = 0;
-var movey = 0;
-var movekaanto = "";
-var mycolor = "";
-var myTurn = false;
-var siirtoTila = "klikkaa";
-var pendingMove = null;
-
-for (var i = 0; i < 6; i++) {
-    board[i] = new Array(6);
-    board_pos[i] = new Array(6);
-    for (var j = 0; j < 6; j++) {
-        board[i][j] = "tyhja";
-        board_pos[i][j] = {x: 2*offset+ j*vali, y: 2*offset+ i*vali};
-        console.log(board_pos[i][j].x + " " + board_pos[i][j].y);
-    }
-}
-
-myCanvas.addEventListener("click", function (e) {
-    //console.log(e.clientX + " " + e.clientY);
-    if (!myTurn) return;
-    const target = e.target;
-    const rect = target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    for (var i = 0; i < 6; i++) {
-        for (var j = 0; j < 6; j++) {
-            if (Math.abs(board_pos[i][j].x - x) < tunnistus_sade && Math.abs(board_pos[i][j].y - y) < tunnistus_sade) {
-                if (siirtoTila == "klikkaa") {
-                    board[i][j] = mycolor;
-                    pendingMove = [i,j];
-                    movex = i+1;
-                    movey = j+1;
-                    siirtoTila = "kaanna";
-                }
-                //myTurn = false;
-                //makeMoveRequest();
-            }
-        }
-    }
-    for (const i in kaanto_napit) {
-        kaanto = kaanto_napit[i];
-        if (Math.abs(kaanto_pos[kaanto].x - x) < kaanto_tunnistus_sade && Math.abs(kaanto_pos[kaanto].y - y) < kaanto_tunnistus_sade) {
-            if (siirtoTila == "kaanna") {
-                movekaanto = kaanto;
-                pendingMove = null;
-                siirtoTila = "klikkaa";
-                myTurn = false;
-                makeMoveRequest();
-            }
-        }
-    }
-});
+canvas.width = board.ulkosize;
+canvas.height = board.ulkosize;
 
 function laske_mask(x,y) {
     return (BigInt(1) << ((x - BigInt(1)) * BigInt(7) + y - BigInt(1)));
@@ -96,22 +18,13 @@ function symboliKohdassa(x,y, bitboard){
     return "tyhja";
 }
 
-function update_board(bitboard) {
-    console.log(bitboard);
-    for (var i = 0; i < 6; i++) {
-        for (var j = 0; j < 6; j++) {
-            board[i][j] = symboliKohdassa(BigInt(i+1),BigInt(j+1),bitboard);
-        }
-    }
-}
-
 function makeMoveRequest() {
-    console.log("Tehdään siirto " + movex + " " + movey + " " + movekaanto);
+    console.log("Tehdään siirto " + state.movex + " " + state.movey + " " + state.movekaanto);
     $.post("/makemove",
     {
-        movex: movex,
-        movey: movey,
-        movekaanto : movekaanto
+        movex: state.movex,
+        movey: state.movey,
+        movekaanto : state.movekaanto
     },
     function(data, status){
         if (status != "success") return;
@@ -119,93 +32,123 @@ function makeMoveRequest() {
     });
 }
 
+function sendMessage(message) {
+    $.post("/sendgamemessage",
+    {
+        message: message
+    },
+    function(data, status){
+        if (status != "success") return;
+        serverRequest();
+    });
+}
 
-myCanvas.addEventListener("mousemove", function (e) {
-    //console.log(e.clientX + " " + e.clientY);
-    if (!myTurn) return;
+$('#chatbutton').on('click', function() {
+    var textbox = document.getElementById("textbox");
+    if (textbox.value != "") sendMessage(textbox.value)
+    textbox.value = "";
+});
+
+$('#palaabutton').on('click', function() {
+    //Lähetä luovutusilmoitus
+    console.log("NYT LÄHTIII")
+    $.post("/resignrequest",
+    {
+        name: ""
+    },
+    function(data, status){
+        if (status != "success") return;
+        window.location.href = "/play";
+    });
+});
+
+myCanvas.addEventListener("click", function (e) {
     const target = e.target;
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    for (var i = 0; i < 6; i++) {
-        for (var j = 0; j < 6; j++) {
-            if (board[i][j] == "white" || board[i][j] == "black") continue;
-            if (Math.abs(board_pos[i][j].x - x) < tunnistus_sade && Math.abs(board_pos[i][j].y - y) < tunnistus_sade) {
-                board[i][j] = "tyhjavalittu";
-            } else {
-                board[i][j] = "tyhja";
-            }
-        }
-    }
+    state.clickedAt(x,y);
+});
+
+
+myCanvas.addEventListener("mousemove", function (e) {
+    if (!state.myTurn) return;
+    const target = e.target;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (state.siirtoTila == "klikkaa") board.updateHover(x,y);
 });
 
 
 
 function draw_board() {
-    //console.log("Drawing the board");
-    ctx.fillStyle = '#9bc777';
-    ctx.fillRect(0, 0, ulkosize, ulkosize);
-    ctx.fillStyle = 'red';
-    ctx.fillRect(offset, offset, sisasize, sisasize);
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#FF0000";
+    board.draw(ctx, state);
+}
 
-    for (var i = 0; i < 6; i++) {
-        for (var j = 0; j < 6; j++) {
-            ctx.beginPath();
-            //console.log(board[i][j]);
-            if (pendingMove != null && pendingMove[0] === i && pendingMove[1] === j) {
-                ctx.fillStyle = mycolor;
-                ctx.arc(2*offset+ j*vali, 2*offset+ i*vali, kuula_koko, 0, Math.PI*2);
-            } else if (board[i][j] === "tyhja") {
-                ctx.fillStyle = 'grey';
-                ctx.arc(2*offset+ j*vali, 2*offset+ i*vali, kuula_paikan_koko, 0, Math.PI*2);
-            } else if (board[i][j] === "tyhjavalittu") {
-                ctx.fillStyle = 'grey';
-                ctx.arc(2*offset+ j*vali, 2*offset+ i*vali, kuula_paikan_koko + 5, 0, Math.PI*2);
-            } else if (board[i][j] === "white") {
-                ctx.fillStyle = 'white';
-                ctx.arc(2*offset+ j*vali, 2*offset+ i*vali, kuula_koko, 0, Math.PI*2);
-            } else {
-                ctx.fillStyle = 'black';
-                ctx.arc(2*offset+ j*vali, 2*offset+ i*vali, kuula_koko, 0, Math.PI*2);
-            }
-            ctx.fill();
+
+function updateTeksti(res) {
+    var h3 = document.getElementById("vuoroh3");
+    console.log(res.color + "                " + res.gamestate);
+    if (res.gamestate != "kesken") {
+        if (res.gamestate == "valkoisen voitto") {
+            if (res.color == "white") h3.innerHTML = "Voitit pelin!";
+            else h3.innerHTML = "Hävisit pelin!";
+        } else if (res.gamestate == "mustan voitto"){
+            if (res.color == "black") h3.innerHTML = "Voitit pelin!";
+            else h3.innerHTML = "Hävisit pelin!";
+        } else {
+            h3.innerHTML = res.gamestate;
         }
+    } else {
+        if (state.myTurn) h3.innerHTML = "Sinun vuoro";
+        else h3.innerHTML = "Vastustajan vuoro";
     }
-    
-    // Kääntönapit:
-    for (const i in kaanto_napit) {
-        kaanto = kaanto_napit[i];
-        ctx.beginPath();
-        ctx.fillStyle = 'blue';
-        ctx.arc(kaanto_pos[kaanto].x, kaanto_pos[kaanto].y, kaanto_tunnistus_sade, 0, Math.PI*2);
-        ctx.fill();
-    }
-    
-    
-    // Piirrä "rasti" keskelle
-    ctx.beginPath();
-    ctx.moveTo(2*offset - 0.5*vali, 2*offset + vali*2.5);
-    ctx.lineWidth = 10;
-    ctx.lineTo(2*offset + 5.5*vali, 2*offset + vali*2.5);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(2*offset + vali*2.5, 2*offset - 0.5*vali);
-    ctx.lineWidth = 10;
-    ctx.lineTo(2*offset + vali*2.5, 2*offset + 5.5*vali);
-    ctx.stroke();
 }
 
-function Update() {
-    //ctx.clearRect(0,0, myCanvas.width, myCanvas.height);
-    draw_board();
-    requestAnimationFrame(Update);
+function time_formatter(time) {
+    var osa1 = Math.floor(time/60) + "";
+    if (osa1.length == 1) osa1 = "0" + osa1;
+    var osa2 = time%60 + "";
+    if (osa2.length == 1) osa2 = "0" + osa2;
+    return osa1 + ":" + osa2;
 }
 
-Update();
+function updateAika(res) {
+    var h3 = document.getElementById("peliaikah3");
+    var teksti = "";
+    teksti += time_formatter(res.whitetime);
+    teksti += " ";
+    teksti += time_formatter(res.blacktime);
+    h3.innerHTML = teksti;
+}
 
-setInterval(serverRequest, 500);
-serverRequest();
+function is_empty(obj) {
+    var count = 0;
+    for (const i in obj) {
+        count += 1;
+        break;
+    }
+    return count == 0;
+}
+
+function update_chat(viestit, lahettajat) {
+    if (is_empty(viestit)) return;
+    var container = document.getElementById("chatcontent");
+    for (const i in viestit) {
+        viesti_element = document.createElement('p');
+        viesti_element.innerHTML = lahettajat[i] + ":\t" + viestit[i];
+        container.appendChild(viesti_element);
+    }
+    container.maxScrollTop = container.scrollHeight - container.offsetHeight;
+    if (container.maxScrollTop - container.scrollTop <= container.offsetHeight) {
+        container.scrollTop = container.scrollHeight;
+    } else {
+        
+    }
+}
 
 
 function serverRequest() {
@@ -213,31 +156,23 @@ function serverRequest() {
         if (status != "success") return;
         console.log(data, status);
         const res = JSON.parse(data);
-        //TODO tee ehto turvallisemmaksi:
-        if (res.positionwhite == "0" && res.positionblack == "0") {
-            if (res.yourturn == "yes") mycolor = "white";
-            else mycolor = "black";
-        }
         // TODO Tässä vielä bugi: jos  tyhjä ruutu on valittu, niin valinta perutaan
-        update_board([BigInt(res.positionwhite), BigInt(res.positionblack)]);
-        if (res.yourturn == "yes") myTurn = true;
-        else myTurn = false;
-        var h3 = document.getElementById("vuoroh3");
-        if (myTurn) h3.innerHTML = "Sinun vuoro";
-        else h3.innerHTML = "Vastustajan vuoro";
-        
-        for (var i = 0; i < 6; i++) {
-            var rivi = ""
-            for (var j = 0; j < 6; j++) {
-                if (board[i][j] != "tyhja") rivi += "X";
-                else rivi += " ";
-            }
-            console.log(rivi);
-        }
-        console.log("pendingMove: " + pendingMove);
-        console.log("My color: " + mycolor);
+        state.update(res);
+        updateTeksti(res);
+        updateAika(res);
+        update_chat(res.viestit, res.lahettajat)
+        console.log("pendingMove: " + state.pendingMove);
+        console.log("My color: " + state.mycolor);
     });
-
 }
+
+function Update() {
+    draw_board();
+    requestAnimationFrame(Update);
+}
+
+Update();
+setInterval(serverRequest, 500);
+serverRequest();
 
 

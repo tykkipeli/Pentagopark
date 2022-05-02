@@ -1,0 +1,57 @@
+Pikselikoordinaatit:
+- x kasvaa oikealle
+- y kasvaa alas
+
+board-taulukko-koordinaatit:
+- i kasvaa alas
+- j kasvaa oikealle
+
+
+TODO:
+- pelistä voi poistua "palaa aulaan" painikkeella
+- jos vastustaja poistuu kesken pelin, voittaa
+- pelin jälkeen vastustajan voi haastaa uusintapeliin
+- peliin lisätään aikaraja pelaajille
+- aikarajan voi itse määrätä haastaessa
+- aulaan ja pelitilaan chat-kenttä
+
+Tietokanta:
+User:
+	-userid
+	-username
+	-rating
+	-salasana
+	
+
+Game:
+	-gameid
+	-valkoisen id
+	-mustan id
+	-voittaja
+	-päiväys
+	-siirtomäärä
+	
+Positio:
+	-positioid
+	-gameid
+	-itse positio (bigint koodaus)
+	-edellisen position id (null jos ei ole)
+	-seuraavan position id (null jos ei ole)
+
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+

@@ -2,6 +2,7 @@
 console.log("HERE WE GO");
 
 var valittu = null;
+var cur_pelaajat = [];
 
 $(document).ready(function() {
         $('#sendbutton').on('click', function() {
@@ -26,6 +27,12 @@ $(document).ready(function() {
             console.log('poistuit');
         });
         
+        $('#chatbutton').on('click', function() {
+            var textbox = document.getElementById("textbox");
+            if (textbox.value != "") sendMessage(textbox.value)
+            textbox.value = "";
+        });
+        
         $('#haastabutton').on('click', function() {
             console.log("haastetaan nyt")
             haasta(valittu);
@@ -35,7 +42,7 @@ $(document).ready(function() {
         $('#playerlist').on('click', 'li', function() {
             console.log($(this).text());
             valittu = $(this).text();
-            //update_classes();
+            paivitaPelaajaLista(cur_pelaajat);
             informServer();
         });
         
@@ -44,19 +51,16 @@ $(document).ready(function() {
         
 });
 
-/*
-function update_classes() {
-    var pelaaja_lista = document.getElementById("playerlist");
-    var children = pelaaja_lista.children;
-    for (var i = 0; i < children.length; i++) {
-        if (children[i].innerHTML == valittu) {
-            children[i].classList.add("valittu");
-        } else {
-            children[i].className = "";
-        }
-    }
+function sendMessage(message) {
+    $.post("/sendlobbymessage",
+    {
+        message: message
+    },
+    function(data, status){
+        if (status != "success") return;
+        informServer();
+    });
 }
-*/
 
 function haasta(haastettava) {
     $.post("/challenge",
@@ -79,8 +83,8 @@ function peruHaaste() {
     },
     function(data, status){
         if (status != "success") return;
+        informServer();
     });
-    informServer();
 }
 
 function hyvaksyHaaste() {
@@ -91,8 +95,8 @@ function hyvaksyHaaste() {
     },
     function(data, status){
         if (status != "success") return;
+        informServer();
     });
-    informServer();
 }
 
 function hylkaaHaaste() {
@@ -103,91 +107,117 @@ function hylkaaHaaste() {
     },
     function(data, status){
         if (status != "success") return;
+        informServer();
     });
-    informServer();
 }
+
+function naytaTulevaHaaste(haastaja) {
+    var div = document.getElementById("tulevahaaste");
+    var h3 = document.createElement('h3');
+    h3.innerHTML = "Pelaaja " + haastaja + " haastaa sinut";
+    var acceptButton = document.createElement('button');
+    acceptButton.innerHTML = "Hyväksy";
+    acceptButton.setAttribute('onclick', "hyvaksyHaaste()");
+    var rejectButton = document.createElement('button');
+    rejectButton.innerHTML = "Hylkää";
+    rejectButton.setAttribute('onclick', "hylkaaHaaste()");
+    div.appendChild(h3);
+    div.appendChild(acceptButton);
+    div.appendChild(rejectButton);
+}
+
+function naytaLahtevaHaaste(haastettava) {
+    var div = document.getElementById("tulevahaaste");
+    var h3 = document.createElement('h3');
+    h3.innerHTML = "Olet lähettänyt haasteen pelaajalle " + haastettava;
+    var cancelButton = document.createElement('button');
+    cancelButton.innerHTML = "Peru haaste";
+    cancelButton.setAttribute('onclick', "peruHaaste()");
+    div.appendChild(h3);
+    div.appendChild(cancelButton);
+}
+
+function paivitaPelaajaLista(pelaajat) {
+    var pelaaja_lista = document.getElementById("playerlist");
+    pelaaja_lista.innerHTML = "";
+    cur_pelaajat = [];
+    for (const i in pelaajat) {
+        li = document.createElement('li');
+        li.innerHTML = pelaajat[i];
+        if (pelaajat[i] == valittu) {
+            li.classList.add("valittu");
+        }
+        pelaaja_lista.appendChild(li);
+        cur_pelaajat.push(pelaajat[i]);
+    }
+}
+
+function is_empty(obj) {
+    var count = 0;
+    for (const i in obj) {
+        count += 1;
+        break;
+    }
+    return count == 0;
+}
+
+function update_chat(viestit, lahettajat) {
+    if (is_empty(viestit)) return;
+    var container = document.getElementById("chatcontent");
+    for (const i in viestit) {
+        viesti_element = document.createElement('p');
+        viesti_element.innerHTML = lahettajat[i] + ":\t" + viestit[i];
+        container.appendChild(viesti_element);
+    }
+    container.maxScrollTop = container.scrollHeight - container.offsetHeight;
+    if (container.maxScrollTop - container.scrollTop <= container.offsetHeight) {
+        container.scrollTop = container.scrollHeight;
+    } else {
+        
+    }
+}
+
+/*
+function messageAdd(message) {
+	var container = document.querySelector('.content')
+
+    container.maxScrollTop = container.scrollHeight - container.offsetHeight
+
+    document.querySelector('.btn').addEventListener('click', function () {
+
+    if (container.maxScrollTop - container.scrollTop <= container.offsetHeight) {
+    // We can scroll to the bottom.
+    // Setting scrollTop to a high number will bring us to the bottom.
+    // setting its value to scrollHeight seems a good idea, because
+    // scrollHeight is always higher than scrollTop.
+    // However we could use any value (e.g. something like 99999 should be ok) 
+    container.scrollTop = container.scrollHeight
+    console.log("I just scrolled to the bottom!")
+    } else {
+    console.log("I won't scroll: you're way too far from the bottom!\n" +
+    "You should maybe alert the user that he received a new message.\n" +
+    "If he wants to scroll at this point, he must do it manually.")
+    }
+}
+*/
 
 function informServer() {
     $.get("/present", function(data,status) {
         if (status != "success") return;
         console.log(data, status);
         const res = JSON.parse(data);
-        //console.log(res);
-        /*for (const i in res) {
-            console.log(res[i]);
-        }
-        */
         var div = document.getElementById("tulevahaaste");
         div.innerHTML = "";
         if (res.roomid != "") {
             window.location.href = "/startgame";
         } else if (res.haastaja != "") {
-            var h3 = document.createElement('h3');
-            h3.innerHTML = "Pelaaja " + res.haastaja + " haastaa sinut";
-            var acceptButton = document.createElement('button');
-            acceptButton.innerHTML = "Hyväksy";
-            acceptButton.setAttribute('onclick', "hyvaksyHaaste()");
-            var rejectButton = document.createElement('button');
-            rejectButton.innerHTML = "Hylkää";
-            rejectButton.setAttribute('onclick', "hylkaaHaaste()");
-            div.appendChild(h3);
-            div.appendChild(acceptButton);
-            div.appendChild(rejectButton);
+            naytaTulevaHaaste(res.haastaja);
         } else if (res.haastettava != "") {
-            var h3 = document.createElement('h3');
-            h3.innerHTML = "Olet lähettänyt haasteen pelaajalle " + res.haastettava;
-            var cancelButton = document.createElement('button');
-            cancelButton.innerHTML = "Peru haaste";
-            cancelButton.setAttribute('onclick', "peruHaaste()");
-            div.appendChild(h3);
-            div.appendChild(cancelButton);
+            naytaLahtevaHaaste(res.haastettava);
         }
-        
-        var pelaaja_lista = document.getElementById("playerlist");
-        pelaaja_lista.innerHTML = "";
-        for (const i in res.pelaajat) {
-            li = document.createElement('li');
-            li.innerHTML = res.pelaajat[i];
-            if (res.pelaajat[i] == valittu) {
-                li.classList.add("valittu");
-            }
-            pelaaja_lista.appendChild(li);
+        if (JSON.stringify(res.pelaajat) != JSON.stringify(cur_pelaajat)) {
+            paivitaPelaajaLista(res.pelaajat);
         }
-        
+        update_chat(res.viestit, res.lahettajat);
     });
-    /*
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            //document.getElementById("demo").innerHTML = this.responseText;
-            const res = JSON.parse(this.responseText);
-            console.log(res);
-            for (const i in res) {
-                console.log(res[i]);
-            }
-            var pelaaja_lista = document.getElementById("players");
-            pelaaja_lista.innerHTML = "";
-            for (const i in res) {
-                li = document.createElement('li');
-                li.innerHTML = res[i];
-                pelaaja_lista.appendChild(li);
-            }
-       }
-    };
-    xhttp.open("GET", "/present", true);
-    xhttp.send();
-    */
 }
-
-document.querySelector('#players').addEventListener('click', function(e) {   
-    var selected;
-  console.log("clicked")
-  if(e.target.tagName === 'LI') {                                      
-    selected= document.querySelector('li.selected');                   
-    if(selected) {selected.className= '';    
-        console.log(selected.innerHTML);
-        vastustaja = selected.innerHTML;
-    }
-    e.target.className= 'selected';                                    
-  }
-});
