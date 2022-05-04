@@ -3,16 +3,13 @@
 <div class="content">
     <div class ="login">
         {% if not session.username %}
-        <form action="/login" method="POST">
+        <h1> Luo uusi käyttäjätunnus </h1>
+        <form action="/register" method="POST">
             <p>Tunnus:<br>
             <input type="text" name="username"></p>
             <p>Salasana:<br>
             <input type="password" name="password"></p>
-            <input id="loginbutton" type="submit" value="Kirjaudu">
-        </form>
-        <br>
-        <form action="/registerpage" method="POST">
-            <input id="registerbutton" type="submit" value="Luo uusi käyttäjä">
+            <input id="registerbutton" type="submit" value="Luo käyttäjä">
         </form>
         {% endif %}
     </div>

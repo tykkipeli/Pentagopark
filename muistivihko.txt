@@ -36,7 +36,7 @@ Positio:
 	-gameid
 	-itse positio (bigint koodaus)
 	-edellisen position id (null jos ei ole)
-	-seuraavan position id (null jos ei ole)
+	-seuraavan position id (null jos ei ole) //ei tarvita!!
 
 
 
