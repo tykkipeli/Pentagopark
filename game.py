@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+import gameDAO
 
 class Game:
     def __init__(self, white, black, gameid):
@@ -47,6 +48,8 @@ class Game:
         if ero.seconds >= 1:
             self.state = "valkoisen voitto"
             self.extraInformation = "Musta jätti pelin"
+        if self.state != "kesken":
+            gameDAO.save_game(self)
     
     def report_activity(self, player):
         if self.white == player:
@@ -80,6 +83,8 @@ class Game:
         if self.blackTime < timedelta(seconds = 0):
             self.state = "valkoisen voitto"
             self.blackTime = timedelta(seconds = 0)
+        if self.state != "kesken":
+            gameDAO.save_game(self)
         
     def get_inactive_players(self):
         lista = []
@@ -95,9 +100,14 @@ class Game:
     def resign(self, player):
         if player == self.white:
             self.white_active = False
+        else:
+            self.black_active = False
+        if self.state != "kesken":
+            return
+        if player == self.white:
             self.state = "mustan voitto"
             self.extraInformation = "Valkoinen luovutti"
         elif player == self.black:
-            self.black_active = False
             self.state = "valkoisen voitto"
             self.extraInformation = "Musta luovutti"
+        gameDAO.save_game(self)
