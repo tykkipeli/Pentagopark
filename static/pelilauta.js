@@ -7,17 +7,6 @@ const state = new State(board);
 canvas.width = board.ulkosize;
 canvas.height = board.ulkosize;
 
-function laske_mask(x,y) {
-    return (BigInt(1) << ((x - BigInt(1)) * BigInt(7) + y - BigInt(1)));
-}
-
-function symboliKohdassa(x,y, bitboard){
-    mask = laske_mask(x,y);
-    if ((mask & bitboard[0]) != 0) return "white";
-    if ((mask & bitboard[1]) != 0) return "black";
-    return "tyhja";
-}
-
 function makeMoveRequest() {
     console.log("Tehdään siirto " + state.movex + " " + state.movey + " " + state.movekaanto);
     $.post("/makemove",
@@ -67,7 +56,10 @@ myCanvas.addEventListener("click", function (e) {
     const rect = target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    state.clickedAt(x,y);
+    if (state.myTurn && state.clickAt(x,y)) {
+        //tässä vaiheessa tulisi suoraan päivittää board eikä vasta palvelimen vastauksen jälkeen
+        makeMoveRequest();
+    }
 });
 
 
@@ -91,6 +83,7 @@ function draw_board() {
 
 function updateTeksti(res) {
     var h3 = document.getElementById("vuoroh3");
+    var ratingsh3 = document.getElementById("newratings");
     console.log(res.color + "                " + res.gamestate);
     if (res.gamestate != "kesken") {
         if (res.gamestate == "valkoisen voitto") {
@@ -102,6 +95,7 @@ function updateTeksti(res) {
         } else {
             h3.innerHTML = res.gamestate;
         }
+        ratingsh3.innerHTML = "Uudet ratingit: " + res.white + " " + res.white_new_rating + " , " + res.black + " " + res.black_new_rating;
     } else {
         if (state.myTurn) h3.innerHTML = "Sinun vuoro";
         else h3.innerHTML = "Vastustajan vuoro";

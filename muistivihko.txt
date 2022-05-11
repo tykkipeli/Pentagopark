@@ -7,13 +7,14 @@ board-taulukko-koordinaatit:
 - j kasvaa oikealle
 
 
+Pythonin puolella bitboard indeksit menevät 1-6
+
 TODO:
-- pelistä voi poistua "palaa aulaan" painikkeella
-- jos vastustaja poistuu kesken pelin, voittaa
 - pelin jälkeen vastustajan voi haastaa uusintapeliin
-- peliin lisätään aikaraja pelaajille
 - aikarajan voi itse määrätä haastaessa
-- aulaan ja pelitilaan chat-kenttä
+- Jos aulan käyttäjälista päivittyy jatkuvasti, varmista, että sivupalkki ei jatkuvasti palaa alkuun
+- Analyysissä näkyy montako kertaa asema on pelattu
+- Analysissä listataan positio
 
 Tietokanta:
 User:
@@ -36,19 +37,11 @@ Positio:
 	-gameid
 	-itse positio (bigint koodaus)
 	-edellisen position id (null jos ei ole)
-	-seuraavan position id (null jos ei ole) //ei tarvita!!
 
 
+"SELECT COUNT(*) FROM users WHERE white_bitboard = :id AND "
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	

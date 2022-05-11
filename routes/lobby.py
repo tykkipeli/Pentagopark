@@ -1,4 +1,5 @@
-from app import app, games, gameroom, gameid
+from app import app
+from routes.gameroom import games, gameroom, gameid
 from flask import redirect, render_template, request, session
 import time
 import atexit
@@ -54,10 +55,6 @@ def players_without(name):
 @app.route("/play")
 def play():
     return render_template("aulasivu.html", players=players_without(session["username"]))
-
-@app.route("/startgame")
-def startgame():
-    return render_template("pelisivu.html")
 
 @app.route("/present")
 def present():
@@ -124,7 +121,6 @@ def acceptchallenge():
     if session["username"] in challenges2:
         global gameid
         gameid += 1
-        
         white = session["username"]
         black = challenges2[session["username"]]
         if randint(1,2) == 1:
@@ -136,3 +132,20 @@ def acceptchallenge():
         del challenges2[session["username"]]
         return "success"
     return "fail"
+
+@app.route("/sendlobbymessage",methods=["POST"])
+def sendlobbymessage():
+    global messageindex
+    viesti = request.form["message"]
+    for i in range(10):
+        print("Saatiin viesti " + viesti)
+    aulachat[messageindex] = viesti
+    aulachatsender[messageindex] = session["username"]
+    player = session["username"]
+    for player in players:
+        if not player in playermessages:
+            playermessages[player] = []
+        playermessages[player].append(messageindex)
+    messageindex += 1
+    messageindex %= 1000
+    return "success"

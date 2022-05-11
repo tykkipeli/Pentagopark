@@ -17,8 +17,10 @@ def save_game(game):
     result = db.session.execute(sql, {"black_id":black_id, "white_id":white_id, "winner_id":winner_id, "move_count":move_count})
     game_id = result.fetchone()[0]
     save_positions(game_id, game.positions)
-    userDAO.update_ratings(white_id, black_id, winner_id)
+    new_ratings = userDAO.update_ratings(white_id, black_id, winner_id)
     db.session.commit()
+    game.white_new_rating = new_ratings[0]
+    game.black_new_rating = new_ratings[1]
     
 def save_positions(game_id, positions):
     prev_id = None
@@ -27,3 +29,9 @@ def save_positions(game_id, positions):
             "VALUES (:game_id, :white_bitboard, :black_bitboard, :prev_position) RETURNING id"
         result = db.session.execute(sql, {"game_id":game_id, "white_bitboard":position[0], "black_bitboard":position[1], "prev_position":prev_id})
         prev_id = result.fetchone()[0]
+
+
+def count_positions(board):
+    sql = "SELECT COUNT(*) FROM positions WHERE white_bitboard = :white_bitboard AND black_bitboard = :black_bitboard"
+    result = db.session.execute(sql, {"white_bitboard":board[0], "black_bitboard":board[1]})
+    return result.fetchone()[0]

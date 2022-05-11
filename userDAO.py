@@ -28,6 +28,7 @@ def update_ratings(white_id, black_id, winner_id):
     sql = "UPDATE users SET rating=:rating WHERE id=:id"
     db.session.execute(sql, {"rating":new_ratings[0], "id":white_id})
     db.session.execute(sql, {"rating":new_ratings[1], "id":black_id})
+    return new_ratings
     
 def calculate_new_ratings(white_rating, black_rating, s1):
     r1 = 10**(white_rating / 400)

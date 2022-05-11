@@ -4,19 +4,28 @@
 <!-- import jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
-<div class="pelisivuwrapper">
-    <h2>Pelisivuuuuuuuuuuuuu</h2>
-    <h3>{{ white }} {{ rating_white }} vs. {{ black }} {{ rating_black }} </h3>
+<div class="analysis-wrapper">
+    <h2>Analyysisivu</h2>
     <h3 id="vuoroh3"> Kenenköhän vuoro? </h3>
-    <h3 id="newratings">  </h3>
-     <canvas id="myCanvas"></canvas>
-    <h3 id="peliaikah3"> aika näkymä </h3>
-    <div id="chatcontent" class="chatcontent">
-        
+    <div id="analysis-div">
+        <div> 
+            <canvas id="myCanvas"></canvas>
+            <div id="button-div">
+                <button id="prevbutton">Prev</button>
+                <button id="nextbutton">Next</button>
+            </div>
+        </div>
+        <div id="moves-div">
+            <p id="pos_count_text"> </p>
+            <ul id="movelist">
+                <li> Move 1 </li>
+                <li> Move 2 </li>
+                <li> Move 3 </li>
+                <li> Move 4 </li>
+            </ul>
+        </div>
     </div>
-    <input id="textbox" type="text">
-    <button id="chatbutton">Send</button>
-    <button id="palaabutton" type="button">Palaa aulaan</button> 
+
 </div>
 <img id="oikeaala" src="../static/images/oikeaala.png" alt="oikeaala" style="display: none;">
 <img id="oikeayla" src="../static/images/oikeayla.png" alt="oikeayla" style="display: none;"> 
@@ -25,6 +34,6 @@
 <script src="../static/nelio.js" charset="utf-8"></script>
 <script src="../static/state.js" charset="utf-8"></script>
 <script src="../static/board.js" charset="utf-8"></script>
-<script src="../static/pelilauta.js" charset="utf-8"></script>
+<script src="../static/analysis.js" charset="utf-8"></script>
 <script src="../static/bitboard.js" charset="utf-8"></script>
 {% endblock %}

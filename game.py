@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 import gameDAO
+import bitboard
 
 class Game:
     def __init__(self, white, black, gameid):
@@ -25,6 +26,8 @@ class Game:
         self.chatsenders = [""]*50*self.chatsize
         self.playermessages = {}
         self.chatindex = 0
+        self.black_new_rating = 0
+        self.white_new_rating = 0
     
     def send_message(self, message, player):
         self.chat[self.chatindex] = message
@@ -35,21 +38,6 @@ class Game:
             self.playermessages[p].append(self.chatindex)
         self.chatindex += 1
         self.chatindex %= self.chatsize
-
-    def update_gamestate(self):
-        if self.state != "kesken":
-            return
-        now = datetime.now()
-        ero = now - self.lastseenWhite
-        if ero.seconds >= 1:
-            self.state = "mustan voitto"
-            self.extraInformation = "Valkoinen jätti pelin"
-        ero = now - self.lastseenBlack
-        if ero.seconds >= 1:
-            self.state = "valkoisen voitto"
-            self.extraInformation = "Musta jätti pelin"
-        if self.state != "kesken":
-            gameDAO.save_game(self)
     
     def report_activity(self, player):
         if self.white == player:
@@ -83,6 +71,29 @@ class Game:
         if self.blackTime < timedelta(seconds = 0):
             self.state = "valkoisen voitto"
             self.blackTime = timedelta(seconds = 0)
+        #if self.state != "kesken":
+        #    gameDAO.save_game(self)
+            
+    def check_if_game_is_left(self):
+        if self.state != "kesken":
+            return
+        now = datetime.now()
+        ero = now - self.lastseenWhite
+        if ero.seconds >= 1:
+            self.state = "mustan voitto"
+            self.extraInformation = "Valkoinen jätti pelin"
+        ero = now - self.lastseenBlack
+        if ero.seconds >= 1:
+            self.state = "valkoisen voitto"
+            self.extraInformation = "Musta jätti pelin"
+        #if self.state != "kesken":
+        #    gameDAO.save_game(self)
+            
+    def update_game_data(self):
+        if self.state != "kesken":
+            return
+        self.update_game_times()
+        self.check_if_game_is_left()
         if self.state != "kesken":
             gameDAO.save_game(self)
         
@@ -111,3 +122,23 @@ class Game:
             self.state = "valkoisen voitto"
             self.extraInformation = "Musta luovutti"
         gameDAO.save_game(self)
+        
+    def change_turn(self):
+        if self.turn == self.white:
+            self.turn = self.black
+        else:
+            self.turn = self.white
+
+    def process_new_move(self, movex, movey, movekaanto):
+        board = bitboard.tee_siirto_ja_kaanto(movex,movey, movekaanto, self.positions[-1])
+        self.positions.append(board)
+        self.state = bitboard.get_result(board)
+        self.lastkaanto = movekaanto
+        self.movenumber += 1
+        self.change_turn()
+        if self.state != "kesken":
+            gameDAO.save_game(self)
+        
+        
+        
+        

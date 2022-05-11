@@ -209,7 +209,7 @@ function informServer() {
         var div = document.getElementById("tulevahaaste");
         div.innerHTML = "";
         if (res.roomid != "") {
-            window.location.href = "/startgame";
+            window.location.href = "/startgame/" + res.roomid;
         } else if (res.haastaja != "") {
             naytaTulevaHaaste(res.haastaja);
         } else if (res.haastettava != "") {

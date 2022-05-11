@@ -119,3 +119,29 @@ body {
 #loginbutton {
     margin-top: 10px;
 }
+
+#analysis-div {
+    display: flex;
+}
+
+#moves-div {
+    background-color: blue;
+    flex-grow: 1;
+}
+
+#button-div {
+    display: flex;
+}
+
+button {
+  background-color: #a61e4d;
+  border-radius: 5px;
+  color: #eee;
+  padding: 15px 25px;
+  border: none;
+  margin: 2px;
+}
+
+button:hover {
+   background-color: #d6336c;
+}

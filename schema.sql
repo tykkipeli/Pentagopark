@@ -22,3 +22,8 @@ CREATE TABLE positions (
     black_bitboard BIGINT,
     prev_position INTEGER REFERENCES positions
 );
+
+CREATE INDEX idx_bitboard ON positions (white_bitboard,black_bitboard);
+CREATE INDEX idx_prevpos ON positions (prev_position);
+
+

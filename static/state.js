@@ -16,10 +16,14 @@ class State {
         this.suunta = "myotapaiva";
         this.movenumber = 0;
     }
-    clickedAt(x,y) {
-        if (!this.myTurn) return;
+    
+    // returns true if new move was done
+    clickAt(x,y) {
         if (this.siirtoTila == "klikkaa") this.updateClick(x,y);
-        if (this.siirtoTila == "kaanna") this.updateKaanna(x,y);
+        if (this.siirtoTila == "kaanna") {
+            if (this.updateKaanna(x,y)) return true;
+        }
+        return false;
     }
     
     updateClick(x,y) {
@@ -43,40 +47,10 @@ class State {
             this.pendingMove = null;
             this.siirtoTila = "klikkaa";
             this.myTurn = false;
-            
-            /*
-            this.animationStarted = Date.now();
-            this.animationRunning = true;
-            console.log(kaanto);
-            if (kaanto == "ylavasen-vasen") {
-                this.activeNelio = "vasenyla";
-                this.suunta = "vastapaiva";
-            } else if (kaanto == "ylavasen-oikea") {
-                this.activeNelio = "vasenyla";
-                this.suunta = "myotapaiva";
-            } else if (kaanto == "alavasen-vasen") {
-                this.activeNelio = "vasenala";
-                this.suunta = "vastapaiva";
-            } else if (kaanto == "alavasen-oikea") {
-                this.activeNelio = "vasenala";
-                this.suunta = "myotapaiva";
-            } else if (kaanto == "ylaoikea-vasen") {
-                this.activeNelio = "oikeayla";
-                this.suunta = "vastapaiva";
-            } else if (kaanto == "ylaoikea-oikea") {
-                this.activeNelio = "oikeayla";
-                this.suunta = "myotapaiva";
-            } else if (kaanto == "alaoikea-vasen") {
-                this.activeNelio = "oikeaala";
-                this.suunta = "vastapaiva";
-            } else if (kaanto == "alaoikea-oikea") {
-                this.activeNelio = "oikeaala";
-                this.suunta = "myotapaiva";
-            }
-            */
-            //tässä vaiheessa tulisi suoraan päivittää board eikä vasta palvelimen vastauksen jälkeen
-            makeMoveRequest();
+            return true;
+            //makeMoveRequest();
         }
+        return false;
     }
     
     update(res) {

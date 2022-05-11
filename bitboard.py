@@ -57,7 +57,9 @@ def teeKaanto(kaanto, board):
     elif kaanto == "alaoikea-oikea":
         return kaannaOikealle(5,5, board)
     return "invalid kaanto"
-        
+       
+
+# 0 is white
 def symboliKohdassa(x,y, board):
     mask = laske_mask(x,y)
     if mask & board[0] != 0:
@@ -80,8 +82,17 @@ def make_whole_move(x, y, board, vuoro):
     else:
         return (make_move(x,y, board[vuoro]), board[1])
     
-def tee_siirto_ja_kaanto(x,y,kaanto, board, vuoro):
-    board = make_whole_move(x,y,board,vuoro)
+# 0 = valkoisen vuoro    
+def deduct_turn(board):
+    if bin(board[0]).count('1') == bin(board[1]).count('1'):
+        return 0
+    return 1
+    
+def tee_siirto_ja_kaanto(x,y,kaanto, board):
+    print(deduct_turn(board))
+    print(board)
+    board = make_whole_move(x,y,board, deduct_turn(board))
+    print(board)
     return (teeKaanto(kaanto,board[0]), teeKaanto(kaanto, board[1]))
 
 def get_result(board):
