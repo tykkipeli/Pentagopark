@@ -16,14 +16,11 @@ def analysis():
 def makeanalysismove():
     boardwhite = int(request.form["bitboardwhite"])
     boardblack = int(request.form["bitboardblack"])
-    movex = int(request.form["movex"])
-    movey = int(request.form["movey"])
+    movex = int(request.form["movex"]) # ei tarvita?
+    movey = int(request.form["movey"]) # ei tarvita?
     movekaanto = request.form["movekaanto"]
     bitboard.tulosta((boardwhite, boardblack))
-    #board = bitboard.tee_siirto_ja_kaanto(movex,movey, movekaanto, (boardwhite, boardblack))
-    #Tässä pelkästään kääntö tehdään palvelimella:
-    board = (bitboard.teeKaanto(movekaanto,boardwhite), bitboard.teeKaanto(movekaanto, boardblack))
-    bitboard.tulosta(board)
+    board = (boardwhite, boardblack)
     color = "black"
     if bitboard.deduct_turn(board) == 0:
         color = "white"
@@ -34,6 +31,7 @@ def makeanalysismove():
         "color" : color,
         "yourturn" : "yes",
         "movenumber" : bin(board[0]).count('1') + bin(board[1]).count('1'),
-        "position_count": gameDAO.count_positions(board)
+        "position_count": gameDAO.count_positions(board),
+        "positions_data": gameDAO.get_next_postitions_data(board)
     }
     return json.dumps(vastaus)

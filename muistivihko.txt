@@ -7,7 +7,8 @@ board-taulukko-koordinaatit:
 - j kasvaa oikealle
 
 
-Pythonin puolella bitboard indeksit menevät 1-6
+Pythonin puolella bitboard indeksit menevät 1-6 (symboliKohdassa olettaa arvoa 1-6!!!)
+Javascriptin board-rakenteessa indeksit menevät 0-5
 
 TODO:
 - pelin jälkeen vastustajan voi haastaa uusintapeliin
@@ -15,6 +16,8 @@ TODO:
 - Jos aulan käyttäjälista päivittyy jatkuvasti, varmista, että sivupalkki ei jatkuvasti palaa alkuun
 - Analyysissä näkyy montako kertaa asema on pelattu
 - Analysissä listataan positio
+- Animaatio pätkii, kun uusista siirroista lasketaan getDescription
+- Tee Cache positiodatalle javascriptiin
 
 Tietokanta:
 User:
@@ -38,13 +41,94 @@ Positio:
 	-itse positio (bigint koodaus)
 	-edellisen position id (null jos ei ole)
 
+	
 
-"SELECT COUNT(*) FROM users WHERE white_bitboard = :id AND "
+EXPLAIN 
+SELECT p1.white_bitboard, p1.black_bitboard, COUNT(*) 
+FROM positions p1, positions p2 
+WHERE p1.prev_position = p2.id AND p2.white_bitboard = 0 AND p2.black_bitboard = 0 
+GROUP BY p1.white_bitboard, p1.black_bitboard;
+
+
+Tässä toimiva haku:
+
+SELECT whtbb, blcbb, COUNT(*), COUNT(g.id)
+FROM
+(SELECT p1.white_bitboard AS whtbb, p1.black_bitboard AS blcbb, p1.game_id AS gameid FROM positions p1, positions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = 0 AND p2.black_bitboard = 0) AS foo
+LEFT JOIN games g
+ON g.id = gameid AND g.white_id = g.winner_id
+GROUP BY whtbb, blcbb;
+
+
+Tässä toimiva, joka laskee myös mustan voitot:
+SELECT whtbb, blcbb, COUNT(*), COUNT(g.id), COUNT(g2.id)
+FROM
+	((SELECT p1.white_bitboard AS whtbb, p1.black_bitboard AS blcbb, p1.game_id AS gameid 
+	FROM positions p1, positions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = 0 AND p2.black_bitboard = 0) AS foo
+	LEFT JOIN games g
+	ON g.id = gameid AND g.white_id = g.winner_id)
+LEFT JOIN games g2
+ON g2.id = gameid AND g2.black_id = g2.winner_id
+GROUP BY whtbb, blcbb;
+
+
+
+
+
+
+
+
+
+
+
+
+Kysyttävää:
+	Mitä jos positions tauluun tallettaa edellisen position id:n lisäksi itse bitboardin. Tällöin seuraavat positiot olisi helppo hakea. Olisiko tämä parempi?
+	Positioonhan voisi tallettaa myös tiedon siitä, voittiko valkoinen positiota vastaavan pelin
+	mites Where user.username = ? And user.rating > ?. Tuleeko ne laittaa kahteen kertaan sql kyselyyn molempiin left joineihin?
+
+
+
+EXPLAIN 
+SELECT p1.white_bitboard, p1.black_bitboard, COUNT(*) 
+FROM testpositions p1, testpositions p2 
+WHERE p1.prev_position = p2.id AND p2.white_bitboard = 0 AND p2.black_bitboard = 0 
+GROUP BY p1.white_bitboard, p1.black_bitboard;
+
+
+EXPLAIN
+SELECT whtbb, blcbb, COUNT(*), COUNT(g.id)
+FROM
+(SELECT p1.white_bitboard AS whtbb, p1.black_bitboard AS blcbb, p1.game_id AS gameid FROM testpositions p1, testpositions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = 0 AND p2.black_bitboard = 0) AS foo
+LEFT JOIN testgames g
+ON g.id = gameid AND g.white_id = g.winner_id
+GROUP BY whtbb, blcbb;
+
+
+EXPLAIN
+SELECT whtbb, blcbb, COUNT(*) AS lkm, COUNT(g.id), COUNT(g2.id)
+FROM
+	((SELECT p1.white_bitboard AS whtbb, p1.black_bitboard AS blcbb, p1.game_id AS gameid 
+	FROM testpositions p1, testpositions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = 1099511627776 AND p2.black_bitboard = 0) AS foo
+	LEFT JOIN testgames g
+	ON g.id = gameid AND g.white_id = g.winner_id)
+LEFT JOIN testgames g2
+ON g2.id = gameid AND g2.black_id = g2.winner_id
+GROUP BY whtbb, blcbb
+ORDER BY lkm DESC;
+
+
+
+
+
+
+select count(*) from testpositions where white_bitboard = 4 and black_bitboard = 1;
+
+(alas, oikealle)
 
 
 	
-	
-	
+tail_index >= pos_index + 1
 	
 	
 

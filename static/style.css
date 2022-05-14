@@ -133,6 +133,11 @@ body {
     display: flex;
 }
 
+#movelist {
+    height: 400px; /* tämä pitää tehdä paremmin */
+    overflow-y: scroll;
+}
+
 button {
   background-color: #a61e4d;
   border-radius: 5px;

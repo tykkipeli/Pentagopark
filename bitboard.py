@@ -89,10 +89,10 @@ def deduct_turn(board):
     return 1
     
 def tee_siirto_ja_kaanto(x,y,kaanto, board):
-    print(deduct_turn(board))
-    print(board)
+    #print(deduct_turn(board))
+    #print(board)
     board = make_whole_move(x,y,board, deduct_turn(board))
-    print(board)
+    #print(board)
     return (teeKaanto(kaanto,board[0]), teeKaanto(kaanto, board[1]))
 
 def get_result(board):
@@ -124,5 +124,7 @@ def testailu():
 
 #testailu()
 
-
+tulosta((65536,0))
+tulosta((4,1))
+tulosta((4,0))
 

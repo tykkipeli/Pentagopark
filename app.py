@@ -11,6 +11,12 @@ import routes.analysis
 
 app.secret_key = getenv("SECRET_KEY")
 
+
+#import dbtest
+#dbtest.suorita()
+#quit()
+
+
 @app.route("/")
 def index():
     return render_template("etusivu.html")

@@ -80,7 +80,7 @@ class Board {
                 if (this.board[i][j] == "white" || this.board[i][j] == "black") continue;
                 if (Math.abs(this.board_pos[i][j].x - x) < this.tunnistus_sade && Math.abs(this.board_pos[i][j].y - y) < this.tunnistus_sade) {
                     this.board[i][j] = "tyhjavalittu";
-                    console.log(i + " " + j);
+                    //console.log(i + " " + j);
                 } else {
                     this.board[i][j] = "tyhja";
                 }

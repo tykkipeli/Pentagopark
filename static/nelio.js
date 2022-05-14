@@ -16,6 +16,7 @@ class Nelio {
     draw(ctx, board, state) {
         var kuulaRotateAngle = 0;
         if (this.nimi == state.activeNelio) {
+        //if (state.activeNeliot.has(this.nimi)) {
             if (state.animationRunning) {
                 var currentTime = Date.now();
                 var elapsed = currentTime - state.animationStarted;
@@ -31,7 +32,12 @@ class Nelio {
                 this.angle += this.angleDelta;
                 this.angleDelta = 0;
                 state.animationRunning = false;
+                //state.activeNeliot.delete(this.nimi);
             }
+        } else {
+            // TODO Tämä kääntää kuvioiden suunnat alkutilaan
+            //this.angle = 0;
+            this.angleDelta = 0;
         }
         
         var hypotenuusa = Math.sqrt(2)*this.sivu/2;

@@ -86,6 +86,8 @@ class State {
             } else if (kaanto == "alaoikea-oikea") {
                 this.activeNelio = "oikeaala";
                 this.suunta = "myotapaiva";
+            } else {
+                this.animationRunning = false;
             }
         }
         this.movenumber = res.movenumber;
