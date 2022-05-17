@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- import jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<div class="ranking-wrapper">
+    <h2>Ranking-sivu</h2>
+    <ul id="rankinglist">
+        {% for user in users %}
+            <li class="list-group-item">
+                <a href="/profile/{{ user.user }}"> {{ user.rank }}. {{ user.user }}   {{ user.rating }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div id="button-div">
+        <a href="/ranking/{{ offset - 30 }}" id="prevbutton">Prev</a>
+        <a href="/ranking/{{ offset + 30 }}" id="nextbutton">Next</a>
+    </div>
+</div>
+{% endblock %}

@@ -72,6 +72,13 @@ def create_random_game():
         positions.append(board)
     return positions
 
+def change_ratings():
+    users = get_users()
+    for user in users:
+        x = randint(400,3100)
+        sql = "UPDATE testusers SET rating=:rating WHERE id=:id"
+        db.session.execute(sql, {"rating":x, "id":user})
+    db.session.commit()
 
 def suorita():
         #generate_users(1000)
@@ -79,3 +86,10 @@ def suorita():
         #print(create_random_game())
         #generate_games(100000)
         #print("done!")
+        #change_ratings()
+        
+        
+        
+        
+        
+        

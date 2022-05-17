@@ -8,6 +8,8 @@ import routes.authentication
 import routes.gameroom
 import routes.lobby
 import routes.analysis
+import routes.ranking
+import routes.profile
 
 app.secret_key = getenv("SECRET_KEY")
 
@@ -16,8 +18,8 @@ app.secret_key = getenv("SECRET_KEY")
 #dbtest.suorita()
 #quit()
 
-
 @app.route("/")
 def index():
     return render_template("etusivu.html")
+
 

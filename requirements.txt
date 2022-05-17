@@ -1,3 +1,5 @@
+APScheduler==3.8.1
+backports.zoneinfo==0.2.1
 bidict==0.21.4
 click==8.0.3
 Flask==2.0.2
@@ -11,5 +13,10 @@ psycopg2==2.9.3
 python-dotenv==0.19.2
 python-engineio==4.3.0
 python-socketio==5.5.0
+pytz==2021.3
+pytz-deprecation-shim==0.1.0.post0
+six==1.16.0
 SQLAlchemy==1.4.29
+tzdata==2021.5
+tzlocal==4.1
 Werkzeug==2.0.2

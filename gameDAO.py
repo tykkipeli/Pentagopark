@@ -32,7 +32,7 @@ def save_positions(game_id, positions):
 
 
 def count_positions(board):
-    sql = "SELECT COUNT(*) FROM testpositions WHERE white_bitboard = :white_bitboard AND black_bitboard = :black_bitboard"
+    sql = "SELECT COUNT(*) FROM positions WHERE white_bitboard = :white_bitboard AND black_bitboard = :black_bitboard"
     result = db.session.execute(sql, {"white_bitboard":board[0], "black_bitboard":board[1]})
     return result.fetchone()[0]
 
@@ -40,10 +40,10 @@ def get_next_postitions_data(board):
     sql = """SELECT whtbb, blcbb, COUNT(*) AS lkm, COUNT(g.id), COUNT(g2.id)
 FROM
     ((SELECT p1.white_bitboard AS whtbb, p1.black_bitboard AS blcbb, p1.game_id AS gameid 
-    FROM testpositions p1, testpositions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = :white_bitboard AND p2.black_bitboard = :black_bitboard) AS foo
-    LEFT JOIN testgames g
+    FROM positions p1, positions p2 WHERE p1.prev_position = p2.id AND p2.white_bitboard = :white_bitboard AND p2.black_bitboard = :black_bitboard) AS foo
+    LEFT JOIN games g
     ON g.id = gameid AND g.white_id = g.winner_id)
-LEFT JOIN testgames g2
+LEFT JOIN games g2
 ON g2.id = gameid AND g2.black_id = g2.winner_id
 GROUP BY whtbb, blcbb
 ORDER BY lkm DESC"""

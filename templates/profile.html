@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- import jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+<div class="profile-wrapper">
+    <h2>Profiilisivu</h2>
+    <h3> {{ username }} </h3>
+    <h3> Rating: {{ rating }} (rank {{ rank }}. top {{ precentage }}% pelaajista)</h3>
+    <h3> Pelejä yhteensä: {{ game_count }}, voitot: {{ win_count }}, häviöt: {{ loss_count }}, tasapelit: {{ draw_count }} </h3>
+    <h3> Valkoisella värillä: {{ white_game_count }}, voitot: {{ white_win_count }}, häviöt: {{ white_loss_count }}, tasapelit: {{ white_draw_count }} </h3>
+    <h3> Mustalla värillä: {{ black_game_count }}, voitot: {{ black_win_count }}, häviöt: {{ black_loss_count }}, tasapelit: {{ black_draw_count }} </h3>
+    <!--
+    <ul id="gamelist">
+        {% for game in games %}
+            <li class="list-group-item">
+                <a href="/analyysi/{{ game.id }}"> {{ game.white }} vs. {{ game.black }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    -->
+</div>
+{% endblock %}

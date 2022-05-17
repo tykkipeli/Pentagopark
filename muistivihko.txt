@@ -118,17 +118,19 @@ GROUP BY whtbb, blcbb
 ORDER BY lkm DESC;
 
 
-
-
-
-
-select count(*) from testpositions where white_bitboard = 4 and black_bitboard = 1;
-
 (alas, oikealle)
 
 
-	
-tail_index >= pos_index + 1
-	
-	
+Miten päätellä siirto?
+- Selvitä neljännes (katso onko jossain neljännessä jotain muuttunut)
+
+
+SELECT rating, 
+
+SELECT COUNT(*) FROM users 
+
+
+
+
+
 
