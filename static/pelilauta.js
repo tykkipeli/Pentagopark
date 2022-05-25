@@ -38,6 +38,12 @@ $('#chatbutton').on('click', function() {
     textbox.value = "";
 });
 
+$('#textbox').on('keypress', function(event) {
+    if (event.key === "Enter") {
+        document.getElementById("chatbutton").click();
+    }
+});
+
 $('#palaabutton').on('click', function() {
     //Lähetä luovutusilmoitus
     console.log("NYT LÄHTIII")

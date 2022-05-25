@@ -33,6 +33,12 @@ $(document).ready(function() {
             textbox.value = "";
         });
         
+        $('#textbox').on('keypress', function(event) {
+            if (event.key === "Enter") {
+                document.getElementById("chatbutton").click();
+            }
+        });
+        
         $('#haastabutton').on('click', function() {
             console.log("haastetaan nyt")
             haasta(valittu);

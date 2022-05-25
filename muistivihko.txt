@@ -40,6 +40,27 @@ Positio:
 	-gameid
 	-itse positio (bigint koodaus)
 	-edellisen position id (null jos ei ole)
+	
+
+Challenges:
+	-challengeid
+	-challenger_id
+	-challenged_id
+
+Ongoinggames:
+	-gameid
+	-white_id
+	-black_id
+	-turn
+	-white_time
+	-black_time
+	-
+
+Ongoingpositions:
+	-positionid
+	-gameid
+	-bitboard
+	-prevposition id
 
 	
 
