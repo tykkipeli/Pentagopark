@@ -11,14 +11,13 @@
     <h3> Pelejä yhteensä: {{ game_count }}, voitot: {{ win_count }}, häviöt: {{ loss_count }}, tasapelit: {{ draw_count }} </h3>
     <h3> Valkoisella värillä: {{ white_game_count }}, voitot: {{ white_win_count }}, häviöt: {{ white_loss_count }}, tasapelit: {{ white_draw_count }} </h3>
     <h3> Mustalla värillä: {{ black_game_count }}, voitot: {{ black_win_count }}, häviöt: {{ black_loss_count }}, tasapelit: {{ black_draw_count }} </h3>
-    <!--
+    <h3> Käyttäjän {{ username }} pelaamat pelit:</h3>
     <ul id="gamelist">
         {% for game in games %}
             <li class="list-group-item">
-                <a href="/analyysi/{{ game.id }}"> {{ game.white }} vs. {{ game.black }}</a>
+                <a href="/analysis/{{ game.id }}"> {{ game.white }} vs. {{ game.black }} {{ game.date }} </a>
             </li>
         {% endfor %}
     </ul>
-    -->
 </div>
 {% endblock %}

@@ -9,6 +9,8 @@ updateText("white", 0, []);
 canvas.width = board.ulkosize;
 canvas.height = board.ulkosize;
 
+
+var pos_memory = new PositionMemory();
 var position_list = [];
 for (var i = 0; i < 37; i++) {
     var temp = [BigInt(0), BigInt(0)];
@@ -19,7 +21,7 @@ var tail_index = 0;
 var clickable = false;
 var firstMove = true;
 
-analysisMoveRequest2(0, 0, "noturn");
+analysisMoveRequest2(0, 0, "firstmove");
 
 function analysisMoveRequest() {
     console.log("Tehdään siirto " + state.movex + " " + state.movey + " " + state.movekaanto);
@@ -33,8 +35,9 @@ function analysisMoveRequest() {
         movex: state.movex,
         movey: state.movey,
         movekaanto : state.movekaanto,
+        gameid: 0,
     },
-    function(data, status){
+    function(data, status) {
         if (status != "success") return;
         const res = JSON.parse(data);
         update_positionList(res);
@@ -45,18 +48,28 @@ function analysisMoveRequest() {
 }
 
 function analysisMoveRequest2(whitebb, blackbb, movekaanto) {
+    var p = document.getElementById("gameid");
+    var gameid = parseInt(p.innerHTML);
     $.post("/makeanalysismove",
     {
         bitboardwhite: whitebb,
         bitboardblack: blackbb,
         movex: state.movex,
         movey: state.movey,
-        movekaanto : movekaanto,
+        movekaanto: movekaanto,
+        gameid: gameid,
     },
     function(data, status){
         if (status != "success") return;
+        console.log("Täs ollaan!");
         const res = JSON.parse(data);
-        update_positionList(res);
+        console.log(res.lastkaanto);
+        if (res.lastkaanto == "firstmove") {
+            console.log("here we go");
+            pos_memory.add_game_positions(res.game_positions);
+        }
+        if (!firstMove) update_positionList(res);
+        firstMove = false;
         state.update(res);
         updateText(res.color, res.position_count, res.positions_data);
         clickable = true;
@@ -65,8 +78,7 @@ function analysisMoveRequest2(whitebb, blackbb, movekaanto) {
 
 function update_positionList(res) {
     if (res.lastkaanto == "noturn") {
-        if (!firstMove) pos_index--;
-        firstMove = false;
+        pos_index--;
         return;
     }
     pos_index++;
@@ -79,14 +91,28 @@ function update_positionList(res) {
     }
 }
 
+function update_positionList2(res) {
+    if (res.lastkaanto == "noturn") {
+        pos_memory.prev();
+        return;
+    }
+    pos_memory.next(res.positionwhite, res.positionblack);
+}
+
 
 // TODO NÄISSÄ TULISI VARMISTAA, ETTEI VAHINGOSSA LÄHETÄ KAHTA KÄSKYÄ PERÄTTÄIN PALVELIMELLE
 $('#prevbutton').on('click', function() {
     if (!clickable || pos_index == 0) return;
-    bitboard = convert_to_bitboard(board.board);
     var ind = pos_index - 1;
     clickable = false;
     analysisMoveRequest2(position_list[ind][0], position_list[ind][1], "noturn");
+});
+
+$('#prevbutton2').on('click', function() {
+    if (!clickable || !pos_memory.has_prev()) return;
+    pos_memory.prev();
+    clickable = false;
+    analysisMoveRequest2(pos_memory.get_pos()[0], pos_memory.get_pos()[1], "noturn");
 });
 
 $('#nextbutton').on('click', function() {
@@ -94,6 +120,14 @@ $('#nextbutton').on('click', function() {
     bitboard = convert_to_bitboard(board.board);
     var ind = pos_index + 1;
     clickable = false;
+    analysisMoveRequest2(position_list[ind][0], position_list[ind][1], getMoveKaanto(bitboard, BigInt(position_list[ind][0]), BigInt(position_list[ind][1])));
+});
+
+$('#nextbutton2').on('click', function() {
+    if (!clickable || !pos_memory.has_next()) return;
+    bitboard = convert_to_bitboard(board.board);
+    clickable = false;
+    
     analysisMoveRequest2(position_list[ind][0], position_list[ind][1], getMoveKaanto(bitboard, BigInt(position_list[ind][0]), BigInt(position_list[ind][1])));
 });
 

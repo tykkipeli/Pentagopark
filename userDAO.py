@@ -1,15 +1,16 @@
 from flask import Flask
 from werkzeug.security import check_password_hash, generate_password_hash
 from db import db, select_from_where_is
+from sqlalchemy.sql import text
 
 def create_user(username, password, rating):
     hash_value = generate_password_hash(password)
-    sql = "INSERT INTO users (username, password, rating) VALUES (:username, :password, :rating)"
+    sql = text("INSERT INTO users (username, password, rating) VALUES (:username, :password, :rating)")
     db.session.execute(sql, {"username":username, "password":hash_value, "rating":1500})
     db.session.commit()
     
 def password_is_correct(username, password):
-    sql = "SELECT password FROM users WHERE username=:username"
+    sql = text("SELECT password FROM users WHERE username=:username")
     result = db.session.execute(sql, {"username":username})
     row = result.fetchone()
     if row == None:
@@ -25,7 +26,7 @@ def update_ratings(white_id, black_id, winner_id):
     elif winner_id == black_id:
         s1 = 0
     new_ratings = calculate_new_ratings(white_rating, black_rating, s1)
-    sql = "UPDATE users SET rating=:rating WHERE id=:id"
+    sql = text("UPDATE users SET rating=:rating WHERE id=:id")
     db.session.execute(sql, {"rating":new_ratings[0], "id":white_id})
     db.session.execute(sql, {"rating":new_ratings[1], "id":black_id})
     return new_ratings
@@ -40,19 +41,19 @@ def calculate_new_ratings(white_rating, black_rating, s1):
     return (white_rating + k * (s1 - e1), black_rating + k * (s2 - e2))
 
 def get_best_users(offset):
-    sql = "SELECT username, rating FROM users ORDER BY rating DESC LIMIT 30 OFFSET :offset"
+    sql = text("SELECT username, rating FROM users ORDER BY rating DESC LIMIT 30 OFFSET :offset")
     result = db.session.execute(sql, {"offset":offset})
     users = result.fetchall()
     db.session.commit()
     return users
 
 def get_rank(rating):
-    sql = "SELECT COUNT(*) FROM users WHERE rating > :rating"
-    result1 = db.session.execute(sql, {"rating":rating})
-    sql = "SELECT COUNT(*) FROM users"
+    sql = text("SELECT COUNT(*) FROM users WHERE rating > :rating")
+    result1 = db.session.execute(sql, {"rating":rating + 0.0001})
+    sql = text("SELECT COUNT(*) FROM users")
     result2 = db.session.execute(sql)
     db.session.commit()
-    rank = result1.fetchone()[0]
+    rank = result1.fetchone()[0] + 1
     total = result2.fetchone()[0]
     percentage = 100*(rank/total)
     return (rank, f"{percentage:.1f}")
@@ -64,13 +65,13 @@ def get_game_statistics(username, color):
         constraint = " AND G.white_id = U.id"
     elif color == "black":
         constraint = " AND G.black_id = U.id"
-    sql = "SELECT COUNT(*) FROM users U, games G WHERE (G.white_id = U.id OR G.black_id = U.id) AND U.username = :username" + constraint
+    sql = text("SELECT COUNT(*) FROM users U, games G WHERE (G.white_id = U.id OR G.black_id = U.id) AND U.username = :username" + constraint)
     result1 = db.session.execute(sql, {"username":username})
-    sql = "SELECT COUNT(*) FROM users U, games G WHERE (G.white_id = U.id OR G.black_id = U.id) AND U.username = :username" \
-        " AND G.winner_id = U.id" + constraint
+    sql = text("SELECT COUNT(*) FROM users U, games G WHERE (G.white_id = U.id OR G.black_id = U.id) AND U.username = :username" \
+        " AND G.winner_id = U.id" + constraint)
     result2 = db.session.execute(sql, {"username":username})
-    sql = "SELECT COUNT(*) FROM users U, games G WHERE U.username = :username" \
-        " AND ((G.winner_id = G.black_id AND G.white_id = U.id) OR (G.winner_id = G.white_id AND G.black_id = U.id))" + constraint
+    sql = text("SELECT COUNT(*) FROM users U, games G WHERE U.username = :username" \
+        " AND ((G.winner_id = G.black_id AND G.white_id = U.id) OR (G.winner_id = G.white_id AND G.black_id = U.id))" + constraint)
     result3 = db.session.execute(sql, {"username":username})
     total = result1.fetchone()[0]
     wins = result2.fetchone()[0]
@@ -78,6 +79,19 @@ def get_game_statistics(username, color):
     ties = total - wins - losses
     db.session.commit()
     return (total, wins, losses, ties)
+
+
+def get_games(username, offset):
+    sql = text("SELECT G.id, U1.username, U2.username, G.date FROM games G, users U1, users U2" \
+        " WHERE G.white_id = U1.id AND G.black_id = U2.id AND (U1.username = :username OR U2.username = :username)" \
+        " ORDER BY G.date DESC LIMIT 10 OFFSET :offset")
+    result = db.session.execute(sql, {"username":username, "offset":offset})
+    data = result.fetchall()
+    db.session.commit()
+    games = []
+    for item in data:
+        games.append({"id":item[0], "white":item[1], "black":item[2], "date":item[3].date()})
+    return games
 
 
 

@@ -150,3 +150,7 @@ button {
 button:hover {
    background-color: #d6336c;
 }
+
+.hidden {
+    display: none;
+}

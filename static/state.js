@@ -31,6 +31,8 @@ class State {
         if (position != null) {
             var i = position[0];
             var j = position[1];
+            //console.log(this.board.board[i][j]);
+            if (this.board.board[i][j] == "white" || this.board.board[i][j] == "black") return;
             this.board.board[i][j] = this.mycolor;
             this.pendingMove = [i,j];
             this.movex = i+1;

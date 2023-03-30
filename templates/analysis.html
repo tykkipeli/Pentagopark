@@ -4,8 +4,13 @@
 <!-- import jquery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
+<p id="gameid" class="hidden">{{ gameid }}</p>
 <div class="analysis-wrapper">
     <h2>Analyysisivu</h2>
+    {% if white != null %}
+        <h2>{{ white }} vs. {{ black }}</h2> 
+    {% endif %}
+
     <h3 id="vuoroh3"> Kenenköhän vuoro? </h3>
     <div id="analysis-div">
         <div> 
@@ -28,6 +33,7 @@
 <img id="oikeayla" src="../static/images/oikeayla.png" alt="oikeayla" style="display: none;"> 
 <img id="vasenala" src="../static/images/vasenala.png" alt="vasenala" style="display: none;"> 
 <img id="vasenyla" src="../static/images/vasenyla.png" alt="vasenyla" style="display: none;">
+<script src="../static/positionmemory.js" charset="utf-8"></script>
 <script src="../static/bitboard.js" charset="utf-8"></script>
 <script src="../static/nelio.js" charset="utf-8"></script>
 <script src="../static/state.js" charset="utf-8"></script>

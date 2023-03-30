@@ -54,13 +54,22 @@ Ongoinggames:
 	-turn
 	-white_time
 	-black_time
-	-
+	-last_kaanto
 
 Ongoingpositions:
 	-positionid
 	-gameid
 	-bitboard
 	-prevposition id
+	
+activeness:
+	id
+	-player_id
+	-last_seen
+	-lobby (true, false)
+	-game_id
+	
+
 
 	
 
@@ -149,6 +158,85 @@ Miten päätellä siirto?
 SELECT rating, 
 
 SELECT COUNT(*) FROM users 
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://pentago_user:tsubatsibo@localhost:5432/pentagopark_db
+
+
+analysis.js alussa pyydetään palvelimelta kaikki peli_id:tä vastaavat siirrot ja nämä tallennetaan PositionMemory olioon.
+analysis-request pyyntöön lisätään tieto, onko pyyntö siirron kautta vai next/prev nappulan kautta.
+
+
+
+
+
+
+
+ 
+2.   [        ]
+1.[    ]
+
+2.        [     ]
+1.    [                     ]
+
+
+
+     
+     
+     
+2.                 [            ] 
+1. [         ]
+     
+2.         [   ] 
+1.     [                               ]
+
+
+Ensin alkavan välin parittaminen ensin loppuvaan ei toimi.
+
+Hei, nyt kun mietin vähän tarkemmin tuota ehdottamaani lukuvälit tehtävää, niin tuntuu, että siihen tarvitaan sittenkin jotain binäärihakupuuta tai vastaavaa, vai missaankohan jotain? 
+
+Tällä lailla tekisin sen:
+Syöte: joukot A ja B, jotka koostuvat väleistä
+Järjestä A loppupisteen mukaan
+Järjestä B alkupisteen mukaan
+for väli_a in A:
+	Parita väli_a sen joukon B välin kanssa, joka on ehtinyt jo alkaa (tallenna näitä johonkin tietorakenteeseen) ja joka päättyy mahdollisimman aikaisin, mutta ei aiemmin kuin väli_a:n alkupiste
+Eli esim. c++:ssa joku lower_bound tai vastaava.
+
+
+         [        ]
+ 
+
+   [         ]
+
+          [     ]
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

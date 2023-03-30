@@ -54,6 +54,8 @@ def players_without(name):
 
 @app.route("/play")
 def play():
+    if not "username" in session:
+        return render_template("error.html")
     return render_template("aulasivu.html", players=players_without(session["username"]))
 
 @app.route("/present")

@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import redirect, render_template, request, session
 from os import getenv
+import threading
 
 app = Flask(__name__)
 
@@ -21,5 +22,22 @@ app.secret_key = getenv("SECRET_KEY")
 @app.route("/")
 def index():
     return render_template("etusivu.html")
+
+
+
+lock = threading.Lock()
+lista = []
+
+@app.route("/testi")
+def testi():
+    lock.acquire()
+    global lista
+    lista = []
+    for i in range(10000000):
+        lista.append(i)
+    lock.release()
+    return str(len(lista))
+
+
 
 

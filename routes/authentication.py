@@ -26,7 +26,12 @@ def register():
     try:
         username = request.form["username"].strip()
         password = request.form["password"]
+        repeatpassword = request.form["repeatpassword"]
+        if password != repeatpassword:
+            print("Salasanat eivät täsmää")
+            return render_template("register.html")
         userDAO.create_user(username, password, 1500)
+        session["username"] = username
         return redirect("/")
     except:
         print("User already exists")
