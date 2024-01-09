@@ -1,2 +1,2 @@
 # Pentagopark
-Jännittävääkin jännittävämpi harjoitusprojekti Helsingin yliopiston Tietokantasovellus-kurssille.
+Previous version of Pentagopark using Ajax instead of web sockets. Not in use.
